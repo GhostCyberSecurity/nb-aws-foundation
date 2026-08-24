@@ -3,8 +3,7 @@
 A focused, production-minded secure AWS foundation, built for the Northeast Bank
 technical exercise. Full reasoning behind every control is in
 [`DESIGN_DECISIONS.md`](./DESIGN_DECISIONS.md) — start there for "why," this file
-is "how." Prepping for the live walkthrough itself — [`WALKTHROUGH_PREP.md`](./WALKTHROUGH_PREP.md)
-has likely questions with short answer anchors, organized to match the design doc.
+is "how."
 
 ## What's here
 
