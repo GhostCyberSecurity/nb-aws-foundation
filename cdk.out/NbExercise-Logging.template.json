@@ -1,0 +1,518 @@
+{
+ "Resources": {
+  "CloudTrailKeyC795273C": {
+   "Type": "AWS::KMS::Key",
+   "Properties": {
+    "EnableKeyRotation": true,
+    "KeyPolicy": {
+     "Statement": [
+      {
+       "Action": "kms:*",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::Join": [
+          "",
+          [
+           "arn:",
+           {
+            "Ref": "AWS::Partition"
+           },
+           ":iam::930628639495:root"
+          ]
+         ]
+        }
+       },
+       "Resource": "*"
+      },
+      {
+       "Action": "kms:GenerateDataKey*",
+       "Condition": {
+        "StringLike": {
+         "kms:EncryptionContext:aws:cloudtrail:arn": "arn:aws:cloudtrail:*:930628639495:trail/*"
+        }
+       },
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "cloudtrail.amazonaws.com"
+       },
+       "Resource": "*",
+       "Sid": "AllowCloudTrailToEncryptLogs"
+      },
+      {
+       "Action": "kms:DescribeKey",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "cloudtrail.amazonaws.com"
+       },
+       "Resource": "*",
+       "Sid": "AllowCloudTrailToDescribeKey"
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Logging/CloudTrailKey/Resource"
+   }
+  },
+  "CloudTrailKeyAliasD751BA20": {
+   "Type": "AWS::KMS::Alias",
+   "Properties": {
+    "AliasName": "alias/nb-exercise/cloudtrail",
+    "TargetKeyId": {
+     "Fn::GetAtt": [
+      "CloudTrailKeyC795273C",
+      "Arn"
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Logging/CloudTrailKey/Alias/Resource"
+   }
+  },
+  "CloudTrailBucket98B0BFE1": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketEncryption": {
+     "ServerSideEncryptionConfiguration": [
+      {
+       "BucketKeyEnabled": true,
+       "ServerSideEncryptionByDefault": {
+        "KMSMasterKeyID": {
+         "Fn::GetAtt": [
+          "CloudTrailKeyC795273C",
+          "Arn"
+         ]
+        },
+        "SSEAlgorithm": "aws:kms"
+       }
+      }
+     ]
+    },
+    "OwnershipControls": {
+     "Rules": [
+      {
+       "ObjectOwnership": "BucketOwnerEnforced"
+      }
+     ]
+    },
+    "PublicAccessBlockConfiguration": {
+     "BlockPublicAcls": true,
+     "BlockPublicPolicy": true,
+     "IgnorePublicAcls": true,
+     "RestrictPublicBuckets": true
+    },
+    "Tags": [
+     {
+      "Key": "aws-cdk:auto-delete-objects",
+      "Value": "true"
+     }
+    ],
+    "VersioningConfiguration": {
+     "Status": "Enabled"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Logging/CloudTrailBucket/Resource"
+   }
+  },
+  "CloudTrailBucketPolicy2A856177": {
+   "Type": "AWS::S3::BucketPolicy",
+   "Properties": {
+    "Bucket": {
+     "Ref": "CloudTrailBucket98B0BFE1"
+    },
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "s3:*",
+       "Condition": {
+        "Bool": {
+         "aws:SecureTransport": "false"
+        }
+       },
+       "Effect": "Deny",
+       "Principal": {
+        "AWS": "*"
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "CloudTrailBucket98B0BFE1",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "CloudTrailBucket98B0BFE1",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "s3:PutBucketPolicy",
+        "s3:GetBucket*",
+        "s3:List*",
+        "s3:DeleteObject*"
+       ],
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+          "Arn"
+         ]
+        }
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "CloudTrailBucket98B0BFE1",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "CloudTrailBucket98B0BFE1",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": "s3:GetBucketAcl",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "cloudtrail.amazonaws.com"
+       },
+       "Resource": {
+        "Fn::GetAtt": [
+         "CloudTrailBucket98B0BFE1",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": "s3:PutObject",
+       "Condition": {
+        "StringEquals": {
+         "s3:x-amz-acl": "bucket-owner-full-control"
+        }
+       },
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "cloudtrail.amazonaws.com"
+       },
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::GetAtt": [
+            "CloudTrailBucket98B0BFE1",
+            "Arn"
+           ]
+          },
+          "/AWSLogs/930628639495/*"
+         ]
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Logging/CloudTrailBucket/Policy/Resource"
+   }
+  },
+  "CloudTrailBucketAutoDeleteObjectsCustomResource4283719F": {
+   "Type": "Custom::S3AutoDeleteObjects",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F",
+      "Arn"
+     ]
+    },
+    "BucketName": {
+     "Ref": "CloudTrailBucket98B0BFE1"
+    }
+   },
+   "DependsOn": [
+    "CloudTrailBucketPolicy2A856177"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Logging/CloudTrailBucket/AutoDeleteObjectsCustomResource/Default"
+   }
+  },
+  "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ]
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Logging/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role"
+   }
+  },
+  "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-930628639495-us-east-1",
+     "S3Key": "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6.zip"
+    },
+    "Timeout": 900,
+    "MemorySize": 128,
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs24.x",
+    "Description": {
+     "Fn::Join": [
+      "",
+      [
+       "Lambda function for auto-deleting objects in ",
+       {
+        "Ref": "CloudTrailBucket98B0BFE1"
+       },
+       " S3 bucket."
+      ]
+     ]
+    }
+   },
+   "DependsOn": [
+    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Logging/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler",
+    "aws:asset:path": "asset.faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6",
+    "aws:asset:property": "Code"
+   }
+  },
+  "CloudTrailLogGroup343A29D6": {
+   "Type": "AWS::Logs::LogGroup",
+   "Properties": {
+    "LogGroupName": "/cloudtrail/nb-exercise",
+    "RetentionInDays": 30
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Logging/CloudTrailLogGroup/Resource"
+   }
+  },
+  "OrgTrailLogsRole4DF87B95": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "cloudtrail.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Logging/OrgTrail/LogsRole/Resource"
+   }
+  },
+  "OrgTrailLogsRoleDefaultPolicyFCC0CE62": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "logs:PutLogEvents",
+        "logs:CreateLogStream"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "CloudTrailLogGroup343A29D6",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "OrgTrailLogsRoleDefaultPolicyFCC0CE62",
+    "Roles": [
+     {
+      "Ref": "OrgTrailLogsRole4DF87B95"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Logging/OrgTrail/LogsRole/DefaultPolicy/Resource"
+   }
+  },
+  "OrgTrail00859FAE": {
+   "Type": "AWS::CloudTrail::Trail",
+   "Properties": {
+    "CloudWatchLogsLogGroupArn": {
+     "Fn::GetAtt": [
+      "CloudTrailLogGroup343A29D6",
+      "Arn"
+     ]
+    },
+    "CloudWatchLogsRoleArn": {
+     "Fn::GetAtt": [
+      "OrgTrailLogsRole4DF87B95",
+      "Arn"
+     ]
+    },
+    "EnableLogFileValidation": true,
+    "EventSelectors": [],
+    "IncludeGlobalServiceEvents": true,
+    "IsLogging": true,
+    "IsMultiRegionTrail": true,
+    "KMSKeyId": {
+     "Fn::GetAtt": [
+      "CloudTrailKeyC795273C",
+      "Arn"
+     ]
+    },
+    "S3BucketName": {
+     "Ref": "CloudTrailBucket98B0BFE1"
+    },
+    "TrailName": "nb-exercise-trail"
+   },
+   "DependsOn": [
+    "CloudTrailBucketPolicy2A856177",
+    "OrgTrailLogsRoleDefaultPolicyFCC0CE62",
+    "OrgTrailLogsRole4DF87B95"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Logging/OrgTrail/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/5VPy07DMBD8lubsGGhRkbilReIAElHghhBy3SVs4wfy2kBk+d+JY0HhyGlmZ2ZHu0u+XK/56UJ8UC33Q61wx+O9F3Jgk/QcB0083sDIti8mQ6NQUB5mkhiteNwEOYDPYmGPsdL4iaa6rH7X5r4pPlvES7QJ3l6BAg93uwNIT1V6YsVqrUI5HlvL/I/usjD94kGDmasTU7afHrq1/bWz4S23f/PEpLJh751AxeNDhmzPJDEUmsfOKsjajMf7CkuJbQN5qzsgG5wsyR/+x2qdfcc9uI0gYA0R+OnMHk2fWDv6V2tOVvzsnF8sDoRYu2A8auBdwS8IngR8swEAAA=="
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Logging/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "ExportsOutputFnGetAttCloudTrailBucket98B0BFE1Arn2C2BA4DE": {
+   "Value": {
+    "Fn::GetAtt": [
+     "CloudTrailBucket98B0BFE1",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "NbExercise-Logging:ExportsOutputFnGetAttCloudTrailBucket98B0BFE1Arn2C2BA4DE"
+   }
+  },
+  "ExportsOutputFnGetAttCloudTrailKeyC795273CArn702AB4ED": {
+   "Value": {
+    "Fn::GetAtt": [
+     "CloudTrailKeyC795273C",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "NbExercise-Logging:ExportsOutputFnGetAttCloudTrailKeyC795273CArn702AB4ED"
+   }
+  },
+  "ExportsOutputRefCloudTrailBucket98B0BFE15D7C465F": {
+   "Value": {
+    "Ref": "CloudTrailBucket98B0BFE1"
+   },
+   "Export": {
+    "Name": "NbExercise-Logging:ExportsOutputRefCloudTrailBucket98B0BFE15D7C465F"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

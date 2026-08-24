@@ -1,0 +1,205 @@
+{
+ "Resources": {
+  "BreakGlassAdminRole4A8C116E": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Condition": {
+        "Bool": {
+         "aws:MultiFactorAuthPresent": "true"
+        }
+       },
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::Join": [
+          "",
+          [
+           "arn:",
+           {
+            "Ref": "AWS::Partition"
+           },
+           ":iam::930628639495:root"
+          ]
+         ]
+        }
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Description": "Emergency-use admin access. Requires MFA to assume. Every assumption triggers a security alert - see AssumeRoleAlertRule.",
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/AdministratorAccess"
+       ]
+      ]
+     }
+    ],
+    "MaxSessionDuration": 3600,
+    "RoleName": "nb-exercise-breakglass-admin"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Identity/BreakGlassAdminRole/Resource"
+   }
+  },
+  "BreakGlassAssumeRoleAlertRule723DDD8D": {
+   "Type": "AWS::Events::Rule",
+   "Properties": {
+    "EventPattern": {
+     "detail": {
+      "eventName": [
+       "AssumeRole"
+      ],
+      "requestParameters": {
+       "roleArn": [
+        {
+         "Fn::GetAtt": [
+          "BreakGlassAdminRole4A8C116E",
+          "Arn"
+         ]
+        }
+       ]
+      }
+     },
+     "detail-type": [
+      "AWS API Call via CloudTrail"
+     ],
+     "source": [
+      "aws.sts"
+     ]
+    },
+    "State": "ENABLED",
+    "Targets": [
+     {
+      "Arn": {
+       "Fn::ImportValue": "NbExercise-Security:ExportsOutputRefSecurityAlertsTopic1CE4D100F21D31A1"
+      },
+      "Id": "Target0"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Identity/BreakGlassAssumeRoleAlertRule/Resource"
+   }
+  },
+  "SecurityAuditorRole0B35CC3A": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Condition": {
+        "Bool": {
+         "aws:MultiFactorAuthPresent": "true"
+        }
+       },
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::Join": [
+          "",
+          [
+           "arn:",
+           {
+            "Ref": "AWS::Partition"
+           },
+           ":iam::930628639495:root"
+          ]
+         ]
+        }
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Description": "Read-only access for security review/audit work - no write, no data-plane access to workload data.",
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/ReadOnlyAccess"
+       ]
+      ]
+     },
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/SecurityAudit"
+       ]
+      ]
+     }
+    ],
+    "MaxSessionDuration": 14400,
+    "RoleName": "nb-exercise-security-auditor"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Identity/SecurityAuditorRole/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/zPSMzIz0zNQTCwv1k1OydbNyUzSqw4uSUzO1gEKxVdnJubqVQfl56TqOKflgehandSy1LySYqBoKVQUSNfW1uoEVJZk5OfpG+sZmuiZK2YVZ2bqFpXmlWTmpuoFQWgARKWpZG0AAAA="
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Identity/CDKMetadata/Default"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

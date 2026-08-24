@@ -1,0 +1,36 @@
+{
+  "version": "54.0.0",
+  "files": {
+    "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6": {
+      "displayName": "NbExercise-Logging/Custom::S3AutoDeleteObjectsCustomResourceProvider Code",
+      "source": {
+        "path": "asset.faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "930628639495-us-east-1-5f45811b": {
+          "bucketName": "cdk-hnb659fds-assets-930628639495-us-east-1",
+          "objectKey": "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6.zip",
+          "region": "us-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::930628639495:role/cdk-hnb659fds-file-publishing-role-930628639495-us-east-1"
+        }
+      }
+    },
+    "2c11ceeb6db324598c4c7acb71cf30bc3654537544daf7c6470beb59100c2deb": {
+      "displayName": "NbExercise-Logging Template",
+      "source": {
+        "path": "NbExercise-Logging.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "930628639495-us-east-1-39ad9384": {
+          "bucketName": "cdk-hnb659fds-assets-930628639495-us-east-1",
+          "objectKey": "2c11ceeb6db324598c4c7acb71cf30bc3654537544daf7c6470beb59100c2deb.json",
+          "region": "us-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::930628639495:role/cdk-hnb659fds-file-publishing-role-930628639495-us-east-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

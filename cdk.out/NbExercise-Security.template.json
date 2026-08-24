@@ -1,0 +1,151 @@
+{
+ "Resources": {
+  "Detector": {
+   "Type": "AWS::GuardDuty::Detector",
+   "Properties": {
+    "Enable": true,
+    "Features": [
+     {
+      "Name": "S3_DATA_EVENTS",
+      "Status": "ENABLED"
+     },
+     {
+      "Name": "EBS_MALWARE_PROTECTION",
+      "Status": "ENABLED"
+     }
+    ],
+    "FindingPublishingFrequency": "FIFTEEN_MINUTES"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Security/Detector"
+   }
+  },
+  "SecurityAlertsTopic1CE4D100": {
+   "Type": "AWS::SNS::Topic",
+   "Properties": {
+    "DisplayName": "NB Exercise Security Alerts",
+    "TopicName": "nb-exercise-security-alerts"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Security/SecurityAlertsTopic/Resource"
+   }
+  },
+  "SecurityAlertsTopicPolicy1E6023E3": {
+   "Type": "AWS::SNS::TopicPolicy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sns:Publish",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "events.amazonaws.com"
+       },
+       "Resource": {
+        "Ref": "SecurityAlertsTopic1CE4D100"
+       },
+       "Sid": "0"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Topics": [
+     {
+      "Ref": "SecurityAlertsTopic1CE4D100"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Security/SecurityAlertsTopic/Policy/Resource"
+   }
+  },
+  "GuardDutyHighSeverityRule8982E7BD": {
+   "Type": "AWS::Events::Rule",
+   "Properties": {
+    "EventPattern": {
+     "detail": {
+      "severity": [
+       {
+        "numeric": [
+         ">=",
+         7
+        ]
+       }
+      ]
+     },
+     "detail-type": [
+      "GuardDuty Finding"
+     ],
+     "source": [
+      "aws.guardduty"
+     ]
+    },
+    "State": "ENABLED",
+    "Targets": [
+     {
+      "Arn": {
+       "Ref": "SecurityAlertsTopic1CE4D100"
+      },
+      "Id": "Target0"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Security/GuardDutyHighSeverityRule/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/z2LTQ7CIBCFz9I9jFpNPYAeoKnuDcKo2BYMDBpCuLtUEjfv53t5LbRdB+tGfDyXauSTvkI6kZAjK+iS7kE4pQJFONzMEQklWce88ZDO9qUlK7iGn/Z20jL+Ya2Z4RsNlcsQJlzGxXPOrI/0sGa1hc0O9s3Ta81dMKRnhKH6F941kRSgAAAA"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Security/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "ExportsOutputRefSecurityAlertsTopic1CE4D100F21D31A1": {
+   "Value": {
+    "Ref": "SecurityAlertsTopic1CE4D100"
+   },
+   "Export": {
+    "Name": "NbExercise-Security:ExportsOutputRefSecurityAlertsTopic1CE4D100F21D31A1"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

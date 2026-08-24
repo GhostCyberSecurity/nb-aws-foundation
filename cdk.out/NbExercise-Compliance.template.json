@@ -1,0 +1,300 @@
+{
+ "Resources": {
+  "ConfigRoleF94F46B6": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "config.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWS_ConfigRole"
+       ]
+      ]
+     }
+    ],
+    "RoleName": "nb-exercise-config-role"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Compliance/ConfigRole/Resource"
+   }
+  },
+  "ConfigRoleDefaultPolicy2CA5882C": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "s3:PutObject",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::ImportValue": "NbExercise-Logging:ExportsOutputFnGetAttCloudTrailBucket98B0BFE1Arn2C2BA4DE"
+          },
+          "/config/AWSLogs/930628639495/Config/*"
+         ]
+        ]
+       },
+       "Sid": "AllowConfigWriteSnapshots"
+      },
+      {
+       "Action": "s3:GetBucketAcl",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "NbExercise-Logging:ExportsOutputFnGetAttCloudTrailBucket98B0BFE1Arn2C2BA4DE"
+       },
+       "Sid": "AllowConfigGetBucketAcl"
+      },
+      {
+       "Action": [
+        "kms:GenerateDataKey*",
+        "kms:Encrypt"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "NbExercise-Logging:ExportsOutputFnGetAttCloudTrailKeyC795273CArn702AB4ED"
+       },
+       "Sid": "AllowConfigEncrypt"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "ConfigRoleDefaultPolicy2CA5882C",
+    "Roles": [
+     {
+      "Ref": "ConfigRoleF94F46B6"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Compliance/ConfigRole/DefaultPolicy/Resource"
+   }
+  },
+  "Recorder": {
+   "Type": "AWS::Config::ConfigurationRecorder",
+   "Properties": {
+    "RecordingGroup": {
+     "AllSupported": true,
+     "IncludeGlobalResourceTypes": true
+    },
+    "RoleARN": {
+     "Fn::GetAtt": [
+      "ConfigRoleF94F46B6",
+      "Arn"
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Compliance/Recorder"
+   }
+  },
+  "DeliveryChannel": {
+   "Type": "AWS::Config::DeliveryChannel",
+   "Properties": {
+    "ConfigSnapshotDeliveryProperties": {
+     "DeliveryFrequency": "TwentyFour_Hours"
+    },
+    "S3BucketName": {
+     "Fn::ImportValue": "NbExercise-Logging:ExportsOutputRefCloudTrailBucket98B0BFE15D7C465F"
+    },
+    "S3KeyPrefix": "config",
+    "S3KmsKeyArn": {
+     "Fn::ImportValue": "NbExercise-Logging:ExportsOutputFnGetAttCloudTrailKeyC795273CArn702AB4ED"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Compliance/DeliveryChannel"
+   }
+  },
+  "RootMfaEnabled7556CF68": {
+   "Type": "AWS::Config::ConfigRule",
+   "Properties": {
+    "ConfigRuleName": "nb-exercise-RootMfaEnabled",
+    "Source": {
+     "Owner": "AWS",
+     "SourceIdentifier": "ROOT_ACCOUNT_MFA_ENABLED"
+    }
+   },
+   "DependsOn": [
+    "Recorder"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Compliance/RootMfaEnabled/Resource"
+   }
+  },
+  "RootNoAccessKeys9E93BCD0": {
+   "Type": "AWS::Config::ConfigRule",
+   "Properties": {
+    "ConfigRuleName": "nb-exercise-RootNoAccessKeys",
+    "Source": {
+     "Owner": "AWS",
+     "SourceIdentifier": "IAM_ROOT_ACCESS_KEY_CHECK"
+    }
+   },
+   "DependsOn": [
+    "Recorder"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Compliance/RootNoAccessKeys/Resource"
+   }
+  },
+  "CloudTrailEnabled6525CFA0": {
+   "Type": "AWS::Config::ConfigRule",
+   "Properties": {
+    "ConfigRuleName": "nb-exercise-CloudTrailEnabled",
+    "Source": {
+     "Owner": "AWS",
+     "SourceIdentifier": "CLOUD_TRAIL_ENABLED"
+    }
+   },
+   "DependsOn": [
+    "Recorder"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Compliance/CloudTrailEnabled/Resource"
+   }
+  },
+  "GuardDutyEnabledB47205DB": {
+   "Type": "AWS::Config::ConfigRule",
+   "Properties": {
+    "ConfigRuleName": "nb-exercise-GuardDutyEnabled",
+    "Source": {
+     "Owner": "AWS",
+     "SourceIdentifier": "GUARDDUTY_ENABLED_CENTRALIZED"
+    }
+   },
+   "DependsOn": [
+    "Recorder"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Compliance/GuardDutyEnabled/Resource"
+   }
+  },
+  "EbsVolumesEncrypted446DE5B1": {
+   "Type": "AWS::Config::ConfigRule",
+   "Properties": {
+    "ConfigRuleName": "nb-exercise-EbsVolumesEncrypted",
+    "Source": {
+     "Owner": "AWS",
+     "SourceIdentifier": "ENCRYPTED_VOLUMES"
+    }
+   },
+   "DependsOn": [
+    "Recorder"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Compliance/EbsVolumesEncrypted/Resource"
+   }
+  },
+  "NoIncomingSshF55B6A5C": {
+   "Type": "AWS::Config::ConfigRule",
+   "Properties": {
+    "ConfigRuleName": "nb-exercise-NoIncomingSsh",
+    "Source": {
+     "Owner": "AWS",
+     "SourceIdentifier": "INCOMING_SSH_DISABLED"
+    }
+   },
+   "DependsOn": [
+    "Recorder"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Compliance/NoIncomingSsh/Resource"
+   }
+  },
+  "S3NoPublicReadC4ED4A60": {
+   "Type": "AWS::Config::ConfigRule",
+   "Properties": {
+    "ConfigRuleName": "nb-exercise-S3NoPublicRead",
+    "Source": {
+     "Owner": "AWS",
+     "SourceIdentifier": "S3_BUCKET_PUBLIC_READ_PROHIBITED"
+    }
+   },
+   "DependsOn": [
+    "Recorder"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Compliance/S3NoPublicRead/Resource"
+   }
+  },
+  "S3NoPublicWrite83334365": {
+   "Type": "AWS::Config::ConfigRule",
+   "Properties": {
+    "ConfigRuleName": "nb-exercise-S3NoPublicWrite",
+    "Source": {
+     "Owner": "AWS",
+     "SourceIdentifier": "S3_BUCKET_PUBLIC_WRITE_PROHIBITED"
+    }
+   },
+   "DependsOn": [
+    "Recorder"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Compliance/S3NoPublicWrite/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/yWMUQ6CMBBEz8J/WRUNHgB/TUg5gKllgZWyTUrRkKZ3F+jXzLzMTAFFWcI5U7851+2YG3pDaLzSo9jQK5CaIEhrUFQdH1pbQ3rdY3JRaMsd9RA2VB12ccqTZYnauhbd3n2goS+6tRoUMxrxVKx6bOWSntNuTzFGUa9+sHy6wuUG9+wzE+VuYU8Tgkz6B8JZo8m3AAAA"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Compliance/CDKMetadata/Default"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

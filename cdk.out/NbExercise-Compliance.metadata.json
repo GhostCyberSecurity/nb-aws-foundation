@@ -1,0 +1,206 @@
+{
+  "/NbExercise-Compliance": [
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/NbExercise-Compliance/Recorder": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "Recorder"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/NbExercise-Compliance/DeliveryChannel": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DeliveryChannel"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/NbExercise-Compliance/BootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BootstrapVersion"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/NbExercise-Compliance/CheckBootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CheckBootstrapVersion"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/NbExercise-Compliance/ConfigRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ConfigRoleF94F46B6"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib, jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/NbExercise-Compliance/RootMfaEnabled/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "RootMfaEnabled7556CF68"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib, jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/NbExercise-Compliance/RootNoAccessKeys/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "RootNoAccessKeys9E93BCD0"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib, jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/NbExercise-Compliance/CloudTrailEnabled/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CloudTrailEnabled6525CFA0"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib, jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/NbExercise-Compliance/GuardDutyEnabled/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "GuardDutyEnabledB47205DB"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib, jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/NbExercise-Compliance/EbsVolumesEncrypted/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "EbsVolumesEncrypted446DE5B1"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib, jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/NbExercise-Compliance/NoIncomingSsh/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "NoIncomingSshF55B6A5C"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib, jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/NbExercise-Compliance/S3NoPublicRead/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "S3NoPublicReadC4ED4A60"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib, jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/NbExercise-Compliance/S3NoPublicWrite/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "S3NoPublicWrite83334365"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib, jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/NbExercise-Compliance/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib, jsii runtime...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/NbExercise-Compliance/ConfigRole/DefaultPolicy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ConfigRoleDefaultPolicy2CA5882C"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib, jsii runtime...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ]
+}

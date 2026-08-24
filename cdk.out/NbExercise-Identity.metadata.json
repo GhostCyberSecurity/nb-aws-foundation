@@ -1,0 +1,110 @@
+{
+  "/NbExercise-Identity": [
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    },
+    {
+      "type": "aws:cdk:warning",
+      "data": "No cross-stack-reference strength configured, defaulting to \"strong\". We recommend you set feature flag \"@aws-cdk/core:defaultCrossStackReferences\" to \"both\", then deploy everywhere, then set it to \"weak\". Alternatively, set it to \"strong\" explicitly to lock in the current producer-protecting behavior. (See: https://github.com/aws/aws-cdk/blob/main/packages/aws-cdk-lib/README.md#reference-strength) [ack: @aws-cdk/core:crossStackReferencesDefaultStrong]",
+      "trace": [
+        "Annotations.addMessage (/var/folders/hc/_x4d9tpd0lb12xd9kvknd2hr0000gn/T/jsii-kernel-tQhEJw/node_modules/aws-cdk-lib/core/lib/annotations.js:1:3506)",
+        "Annotations.addWarningV2 (/var/folders/hc/_x4d9tpd0lb12xd9kvknd2hr0000gn/T/jsii-kernel-tQhEJw/node_modules/aws-cdk-lib/core/lib/annotations.js:1:2194)",
+        "resolveValue (/var/folders/hc/_x4d9tpd0lb12xd9kvknd2hr0000gn/T/jsii-kernel-tQhEJw/node_modules/aws-cdk-lib/core/lib/private/refs.js:1:6980)",
+        "resolveReferences (/var/folders/hc/_x4d9tpd0lb12xd9kvknd2hr0000gn/T/jsii-kernel-tQhEJw/node_modules/aws-cdk-lib/core/lib/private/refs.js:1:4848)",
+        "prepareApp (/var/folders/hc/_x4d9tpd0lb12xd9kvknd2hr0000gn/T/jsii-kernel-tQhEJw/node_modules/aws-cdk-lib/core/lib/private/prepare-app.js:1:1503)",
+        "synthesize (/var/folders/hc/_x4d9tpd0lb12xd9kvknd2hr0000gn/T/jsii-kernel-tQhEJw/node_modules/aws-cdk-lib/core/lib/private/synthesis.js:1:2625)",
+        "App.synth (/var/folders/hc/_x4d9tpd0lb12xd9kvknd2hr0000gn/T/jsii-kernel-tQhEJw/node_modules/aws-cdk-lib/core/lib/stage.js:1:5061)",
+        "App.synth (/var/folders/hc/_x4d9tpd0lb12xd9kvknd2hr0000gn/T/jsii-kernel-tQhEJw/node_modules/aws-cdk-lib/core/lib/app.js:1:5050)",
+        "/private/var/folders/hc/_x4d9tpd0lb12xd9kvknd2hr0000gn/T/tmphcxkv6_u/lib/program.js:1:55650",
+        "Kernel._Kernel_ensureSync (/private/var/folders/hc/_x4d9tpd0lb12xd9kvknd2hr0000gn/T/tmphcxkv6_u/lib/program.js:1:71267)",
+        "Kernel.invoke (/private/var/folders/hc/_x4d9tpd0lb12xd9kvknd2hr0000gn/T/tmphcxkv6_u/lib/program.js:1:55595)",
+        "KernelHost.processRequest (/private/var/folders/hc/_x4d9tpd0lb12xd9kvknd2hr0000gn/T/tmphcxkv6_u/lib/program.js:1:228006)",
+        "KernelHost.run (/private/var/folders/hc/_x4d9tpd0lb12xd9kvknd2hr0000gn/T/tmphcxkv6_u/lib/program.js:1:226990)",
+        "Immediate._onImmediate (/private/var/folders/hc/_x4d9tpd0lb12xd9kvknd2hr0000gn/T/tmphcxkv6_u/lib/program.js:1:227034)",
+        "process.processImmediate (node:internal/timers:574:21)"
+      ]
+    }
+  ],
+  "/NbExercise-Identity/BootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BootstrapVersion"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/NbExercise-Identity/CheckBootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CheckBootstrapVersion"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/NbExercise-Identity/BreakGlassAdminRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BreakGlassAdminRole4A8C116E"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib, jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/NbExercise-Identity/BreakGlassAssumeRoleAlertRule/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BreakGlassAssumeRoleAlertRule723DDD8D"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib, jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/NbExercise-Identity/SecurityAuditorRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "SecurityAuditorRole0B35CC3A"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib, jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/NbExercise-Identity/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib, jsii runtime...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ]
+}

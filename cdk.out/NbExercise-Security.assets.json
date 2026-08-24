@@ -1,0 +1,21 @@
+{
+  "version": "54.0.0",
+  "files": {
+    "d175b51018072fa1682270b832405cdcf02a3414e8f469d2df2ab9d0fe91b6ac": {
+      "displayName": "NbExercise-Security Template",
+      "source": {
+        "path": "NbExercise-Security.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "930628639495-us-east-1-1a0b548c": {
+          "bucketName": "cdk-hnb659fds-assets-930628639495-us-east-1",
+          "objectKey": "d175b51018072fa1682270b832405cdcf02a3414e8f469d2df2ab9d0fe91b6ac.json",
+          "region": "us-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::930628639495:role/cdk-hnb659fds-file-publishing-role-930628639495-us-east-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

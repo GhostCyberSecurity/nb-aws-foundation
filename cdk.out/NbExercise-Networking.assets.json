@@ -1,0 +1,21 @@
+{
+  "version": "54.0.0",
+  "files": {
+    "4a44c9cb107b6242906e712625d21c4b3afbe92249043896e5f969e28d23f8cc": {
+      "displayName": "NbExercise-Networking Template",
+      "source": {
+        "path": "NbExercise-Networking.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "930628639495-us-east-1-ee66e478": {
+          "bucketName": "cdk-hnb659fds-assets-930628639495-us-east-1",
+          "objectKey": "4a44c9cb107b6242906e712625d21c4b3afbe92249043896e5f969e28d23f8cc.json",
+          "region": "us-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::930628639495:role/cdk-hnb659fds-file-publishing-role-930628639495-us-east-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

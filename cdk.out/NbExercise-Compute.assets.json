@@ -1,0 +1,21 @@
+{
+  "version": "54.0.0",
+  "files": {
+    "7b04f8b4ee58c6ef4e3c7162da2056837ade9246829f2729bd90cb7dba2db602": {
+      "displayName": "NbExercise-Compute Template",
+      "source": {
+        "path": "NbExercise-Compute.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "930628639495-us-east-1-5bdd5e63": {
+          "bucketName": "cdk-hnb659fds-assets-930628639495-us-east-1",
+          "objectKey": "7b04f8b4ee58c6ef4e3c7162da2056837ade9246829f2729bd90cb7dba2db602.json",
+          "region": "us-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::930628639495:role/cdk-hnb659fds-file-publishing-role-930628639495-us-east-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

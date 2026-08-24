@@ -1,0 +1,378 @@
+{
+ "Resources": {
+  "ComputeKeyE4BA443A": {
+   "Type": "AWS::KMS::Key",
+   "Properties": {
+    "EnableKeyRotation": true,
+    "KeyPolicy": {
+     "Statement": [
+      {
+       "Action": "kms:*",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::Join": [
+          "",
+          [
+           "arn:",
+           {
+            "Ref": "AWS::Partition"
+           },
+           ":iam::930628639495:root"
+          ]
+         ]
+        }
+       },
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "kms:Encrypt*",
+        "kms:Decrypt*",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:Describe*"
+       ],
+       "Condition": {
+        "ArnLike": {
+         "kms:EncryptionContext:aws:logs:arn": {
+          "Fn::Join": [
+           "",
+           [
+            "arn:",
+            {
+             "Ref": "AWS::Partition"
+            },
+            ":logs:us-east-1:930628639495:log-group:/ssm/session-logs/nb-exercise"
+           ]
+          ]
+         }
+        }
+       },
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "logs.us-east-1.amazonaws.com"
+       },
+       "Resource": "*",
+       "Sid": "AllowCloudWatchLogsToUseKey"
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Compute/ComputeKey/Resource"
+   }
+  },
+  "ComputeKeyAlias239A957D": {
+   "Type": "AWS::KMS::Alias",
+   "Properties": {
+    "AliasName": "alias/nb-exercise/compute",
+    "TargetKeyId": {
+     "Fn::GetAtt": [
+      "ComputeKeyE4BA443A",
+      "Arn"
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Compute/ComputeKey/Alias/Resource"
+   }
+  },
+  "SessionLogGroupB139EA89": {
+   "Type": "AWS::Logs::LogGroup",
+   "Properties": {
+    "KmsKeyId": {
+     "Fn::GetAtt": [
+      "ComputeKeyE4BA443A",
+      "Arn"
+     ]
+    },
+    "LogGroupName": "/ssm/session-logs/nb-exercise",
+    "RetentionInDays": 30
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Compute/SessionLogGroup/Resource"
+   }
+  },
+  "SessionManagerPreferences": {
+   "Type": "AWS::SSM::Document",
+   "Properties": {
+    "Content": {
+     "schemaVersion": "1.0",
+     "description": "Regional Session Manager settings - nb-exercise",
+     "sessionType": "Standard_Stream",
+     "inputs": {
+      "cloudWatchLogGroupName": {
+       "Ref": "SessionLogGroupB139EA89"
+      },
+      "cloudWatchEncryptionEnabled": true,
+      "cloudWatchStreamingEnabled": true,
+      "kmsKeyId": {
+       "Ref": "ComputeKeyE4BA443A"
+      },
+      "s3EncryptionEnabled": false,
+      "idleSessionTimeout": "20",
+      "maxSessionDuration": "60",
+      "runAsEnabled": false
+     }
+    },
+    "DocumentType": "Session",
+    "Name": "SSM-SessionManagerRunShell"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Compute/SessionManagerPreferences"
+   }
+  },
+  "InstanceRole3CCE2F1D": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "ec2.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Description": "SSM-only instance role - plus kms:Decrypt on compute_key, required for encrypted Session Manager sessions.",
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/AmazonSSMManagedInstanceCore"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Compute/InstanceRole/Resource"
+   }
+  },
+  "InstanceRoleDefaultPolicy1531605C": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "kms:Decrypt",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "ComputeKeyE4BA443A",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "InstanceRoleDefaultPolicy1531605C",
+    "Roles": [
+     {
+      "Ref": "InstanceRole3CCE2F1D"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Compute/InstanceRole/DefaultPolicy/Resource"
+   }
+  },
+  "InstanceSg4966687D": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "SSM-managed instance - no inbound, egress limited to VPC endpoints + S3",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": {
+       "Fn::ImportValue": "NbExercise-Networking:ExportsOutputFnGetAttVpc8378EB38CidrBlock14DD2396"
+      },
+      "Description": "HTTPS to SSM interface endpoints",
+      "FromPort": 443,
+      "IpProtocol": "tcp",
+      "ToPort": 443
+     }
+    ],
+    "VpcId": {
+     "Fn::ImportValue": "NbExercise-Networking:ExportsOutputRefVpc8378EB38272D6E3A"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Compute/InstanceSg/Resource"
+   }
+  },
+  "InstanceSgtopl63a5400a443F8AF25C8": {
+   "Type": "AWS::EC2::SecurityGroupEgress",
+   "Properties": {
+    "Description": "HTTPS to S3 gateway endpoint (patch repos, SSM agent deps)",
+    "DestinationPrefixListId": "pl-63a5400a",
+    "FromPort": 443,
+    "GroupId": {
+     "Fn::GetAtt": [
+      "InstanceSg4966687D",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "ToPort": 443
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Compute/InstanceSg/to pl-63a5400a:443"
+   }
+  },
+  "ManagedInstanceInstanceProfile37FEBC79": {
+   "Type": "AWS::IAM::InstanceProfile",
+   "Properties": {
+    "Roles": [
+     {
+      "Ref": "InstanceRole3CCE2F1D"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Compute/ManagedInstance/InstanceProfile"
+   }
+  },
+  "ManagedInstance55DBCF67": {
+   "Type": "AWS::EC2::Instance",
+   "Properties": {
+    "AvailabilityZone": "us-east-1a",
+    "BlockDeviceMappings": [
+     {
+      "DeviceName": "/dev/xvda",
+      "Ebs": {
+       "DeleteOnTermination": true,
+       "Encrypted": true,
+       "KmsKeyId": {
+        "Fn::GetAtt": [
+         "ComputeKeyE4BA443A",
+         "Arn"
+        ]
+       },
+       "VolumeSize": 8,
+       "VolumeType": "gp3"
+      }
+     }
+    ],
+    "IamInstanceProfile": {
+     "Ref": "ManagedInstanceInstanceProfile37FEBC79"
+    },
+    "ImageId": {
+     "Ref": "SsmParameterValueawsserviceamiamazonlinuxlatestal2023amikernel61x8664C96584B6F00A464EAD1953AFF4B05118Parameter"
+    },
+    "InstanceType": "t3.micro",
+    "LaunchTemplate": {
+     "LaunchTemplateName": "ManagedInstanceLaunchTemplate",
+     "Version": {
+      "Fn::GetAtt": [
+       "ManagedInstanceLaunchTemplate9CDA9BFA",
+       "LatestVersionNumber"
+      ]
+     }
+    },
+    "SecurityGroupIds": [
+     {
+      "Fn::GetAtt": [
+       "InstanceSg4966687D",
+       "GroupId"
+      ]
+     }
+    ],
+    "SubnetId": {
+     "Fn::ImportValue": "NbExercise-Networking:ExportsOutputRefVpcprivateisolatedSubnet1Subnet24CE21A9CBBC011F"
+    },
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "NbExercise-Compute/ManagedInstance"
+     }
+    ],
+    "UserData": {
+     "Fn::Base64": "#!/bin/bash"
+    }
+   },
+   "DependsOn": [
+    "InstanceRoleDefaultPolicy1531605C",
+    "InstanceRole3CCE2F1D"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Compute/ManagedInstance/Resource"
+   }
+  },
+  "ManagedInstanceLaunchTemplate9CDA9BFA": {
+   "Type": "AWS::EC2::LaunchTemplate",
+   "Properties": {
+    "LaunchTemplateData": {
+     "MetadataOptions": {
+      "HttpTokens": "required"
+     }
+    },
+    "LaunchTemplateName": "ManagedInstanceLaunchTemplate"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Compute/ManagedInstance/LaunchTemplate"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/31Oy07DQAz8lt4dFwIqZwQIIThEae/ILG5qso9qvasqivbfSVIVOHGa8cxoPDXWmw1ereiklfnsKysfOG4TmR4m6X3sneL4ygM87P0M91ZI52MhBWzopsBb6J5jyMfZuPACqg4n4TGY7NgnEHI4tsHyHFuwCVbM0v3LXrwm8oabGPZiuQCbeprEJkdJw8+b/4WnLrIqXLr+9i4bKXtz2LE7WkpcCrSsIcez2VAkx4ljgWZIh+DXN3h9i3erLxWpYvZJHGN7xm8LocqdQAEAAA=="
+   },
+   "Metadata": {
+    "aws:cdk:path": "NbExercise-Compute/CDKMetadata/Default"
+   }
+  }
+ },
+ "Parameters": {
+  "SsmParameterValueawsserviceamiamazonlinuxlatestal2023amikernel61x8664C96584B6F00A464EAD1953AFF4B05118Parameter": {
+   "Type": "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
+   "Default": "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64"
+  },
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}
